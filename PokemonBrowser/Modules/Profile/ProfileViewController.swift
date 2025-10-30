@@ -14,6 +14,7 @@ class ProfileViewController: UIViewController, IndicatorInfoProvider {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 18)
+        label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -40,7 +41,7 @@ class ProfileViewController: UIViewController, IndicatorInfoProvider {
         view.backgroundColor = .white
         let stackView = UIStackView(arrangedSubviews: [emailLabel, logoutButton])
         stackView.axis = .vertical
-        stackView.spacing = 30
+        stackView.spacing = 50
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(stackView)
@@ -54,7 +55,7 @@ class ProfileViewController: UIViewController, IndicatorInfoProvider {
     
     private func loadUserData() {
         if let email = UserDefaults.standard.string(forKey: "loggedInUserEmail") {
-            emailLabel.text = "Logged in as: \(email)"
+            emailLabel.text = "Logged in as:\n\(email)"
         }
     }
     
