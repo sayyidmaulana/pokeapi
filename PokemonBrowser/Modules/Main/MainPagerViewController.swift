@@ -10,6 +10,18 @@ import XLPagerTabStrip
 
 class MainPagerViewController: ButtonBarPagerTabStripViewController {
 
+    private let searchController = UISearchController(searchResultsController: nil)
+    
+    private lazy var homeVC: HomeViewController = {
+        let vc = HomeViewController()
+        vc.searchController = self.searchController
+        return vc
+    }()
+    
+    private lazy var profileVC: ProfileViewController = {
+        return ProfileViewController()
+    }()
+
     override func viewDidLoad() {
         settings.style.buttonBarBackgroundColor = .white
         settings.style.buttonBarItemBackgroundColor = .white
@@ -29,6 +41,8 @@ class MainPagerViewController: ButtonBarPagerTabStripViewController {
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
         
+        setupSearchController()
+        
         super.viewDidLoad()
         
         changeCurrentIndexProgressive = { (oldCell: ButtonBarViewCell?, newCell: ButtonBarViewCell?, progressPercentage: CGFloat, changeCurrentIndex: Bool, animated: Bool) -> Void in
@@ -38,10 +52,24 @@ class MainPagerViewController: ButtonBarPagerTabStripViewController {
         }
     }
     
+    private func setupSearchController() {
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search Pokemon"
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+    }
+    
     override func viewControllers(for pagerTabStripController: PagerTabStripViewController) -> [UIViewController] {
-        let homeVC = HomeViewController()
-        let profileVC = ProfileViewController()
-        
         return [homeVC, profileVC]
+    }
+    
+    override func updateIndicator(for viewController: PagerTabStripViewController, fromIndex: Int, toIndex: Int) {
+        super.updateIndicator(for: viewController, fromIndex: fromIndex, toIndex: toIndex)
+        
+        if toIndex == 0 {
+            navigationItem.searchController = searchController
+        } else {
+            navigationItem.searchController = nil
+        }
     }
 }

@@ -16,7 +16,8 @@ class HomeViewController: UIViewController, IndicatorInfoProvider {
     private let viewModel = HomeViewModel()
     private let disposeBag = DisposeBag()
     
-    private let searchController = UISearchController(searchResultsController: nil)
+    var searchController: UISearchController!
+
     private let tableView = UITableView()
     
     override func viewDidLoad() {
@@ -29,11 +30,6 @@ class HomeViewController: UIViewController, IndicatorInfoProvider {
     
     private func setupUI() {
         view.backgroundColor = .white
-        
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search Pokemon"
-        navigationItem.searchController = searchController
-        definesPresentationContext = true
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(PokemonCell.self, forCellReuseIdentifier: "PokemonCell")
@@ -81,9 +77,13 @@ class HomeViewController: UIViewController, IndicatorInfoProvider {
         tableView.rx.modelSelected(PokemonListItem.self)
             .bind(to: viewModel.itemSelected)
             .disposed(by: disposeBag)
-            
-        searchController.searchBar.rx.searchButtonClicked
+        
+        let searchOnButton = searchController.searchBar.rx.searchButtonClicked
             .withLatestFrom(searchController.searchBar.rx.text.orEmpty)
+        let searchText = searchController.searchBar.rx.text.orEmpty
+            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
+        Observable.merge(searchOnButton, searchText)
             .bind(to: viewModel.searchTriggered)
             .disposed(by: disposeBag)
         
